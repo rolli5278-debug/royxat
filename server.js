@@ -44,7 +44,10 @@ function xlsxBuffer() {
 // ---------- Telegram ----------
 const tg = (method, body) =>
   fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, { method: 'POST', body }).then((r) => r.json());
-const say = (chat_id, text) => tg('sendMessage', new URLSearchParams({ chat_id, text }));
+const BTN = '📥 Excel olish';
+const keyboard = JSON.stringify({ keyboard: [[{ text: BTN }]], resize_keyboard: true });
+const say = (chat_id, text, admin = true) =>
+  tg('sendMessage', new URLSearchParams(admin ? { chat_id, text, reply_markup: keyboard } : { chat_id, text }));
 
 async function sendExcel(chat_id) {
   const fd = new FormData();
@@ -64,10 +67,10 @@ async function poll() {
         offset = u.update_id + 1;
         const chat = String(u.message?.chat.id ?? '');
         if (!chat) continue;
-        if (!admins.includes(chat)) { await say(chat, `Ruxsat yo'q. ID: ${chat}`); continue; }
-        const cmd = (u.message.text ?? '').split(/[ @]/)[0];
-        if (cmd === '/excel') await sendExcel(chat);
-        else await say(chat, `Jami ro'yxatdan o'tganlar: ${rows.length}\n/excel — faylni olish`);
+        if (!admins.includes(chat)) { await say(chat, `Ruxsat yo'q. ID: ${chat}`, false); continue; }
+        const text = u.message.text ?? '';
+        if (text === BTN || text.split(/[ @]/)[0] === '/excel') await sendExcel(chat);
+        else await say(chat, `Jami ro'yxatdan o'tganlar: ${rows.length}\nFaylni olish uchun pastdagi tugmani bosing.`);
       }
     } catch (e) {
       console.error('poll:', e.message);
