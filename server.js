@@ -69,7 +69,12 @@ async function poll() {
         if (!chat) continue;
         if (!admins.includes(chat)) { await say(chat, `Ruxsat yo'q. ID: ${chat}`, false); continue; }
         const text = u.message.text ?? '';
-        if (text === BTN || text.split(/[ @]/)[0] === '/excel') await sendExcel(chat);
+        const del = text.match(/^\/ochir\s+([1-9]\d*)/); // /ochir 3 — Excel'dagi № bo'yicha o'chirish
+        if (del) {
+          const [gone] = rows.splice(del[1] - 1, 1);
+          if (gone) fs.writeFileSync(DB, JSON.stringify(rows));
+          await say(chat, gone ? `O'chirildi: ${gone.ism}, ${gone.telefon}\nQoldi: ${rows.length}` : `№${del[1]} topilmadi`);
+        } else if (text === BTN || text.split(/[ @]/)[0] === '/excel') await sendExcel(chat);
         else await say(chat, `Jami ro'yxatdan o'tganlar: ${rows.length}\nFaylni olish uchun pastdagi tugmani bosing.`);
       }
     } catch (e) {
