@@ -103,4 +103,10 @@ http.createServer((req, res) => {
   res.writeHead(404).end();
 }).listen(PORT, () => console.log(`http://localhost:${PORT}`));
 
+// Render bepul tarifi 15 daqiqa so'rovsiz uxlaydi — o'zimizga tashqi URL orqali so'rov yuborib uyg'oq turamiz
+// ponytail: bepul tarifda ham ishlaydi (oyiga 750 soat yetadi); ma'lumot saqlanishi uchun baribir doimiy disk kerak
+if (process.env.RENDER_EXTERNAL_URL) {
+  setInterval(() => fetch(process.env.RENDER_EXTERNAL_URL).catch(() => {}), 10 * 60 * 1000);
+}
+
 if (BOT_TOKEN) poll(); else console.warn('BOT_TOKEN yo\'q — bot o\'chiq');
