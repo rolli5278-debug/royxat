@@ -59,7 +59,8 @@ async function poll() {
   for (;;) {
     try {
       const res = await tg('getUpdates', new URLSearchParams({ offset, timeout: 30 }));
-      for (const u of res.result ?? []) {
+      if (!res.ok) throw new Error(res.description); // noto'g'ri token va h.k.
+      for (const u of res.result) {
         offset = u.update_id + 1;
         const chat = String(u.message?.chat.id ?? '');
         if (!chat) continue;
