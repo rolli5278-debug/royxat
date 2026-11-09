@@ -30,7 +30,7 @@ button{background:#2563eb;color:#fff;border:0}p{min-height:1.4em}</style>
 <button>Yuborish</button><p id=m></p></form>
 <script>f.onsubmit=async e=>{e.preventDefault();m.textContent='...';
 const r=await fetch('/api/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(f)))});
-if(r.ok){f.reset();m.textContent="✅ Ro'yxatdan o'tdingiz, rahmat!"}else m.textContent='❌ '+(await r.text())}</script>`;
+if(r.ok){f.reset();m.innerHTML='✅ Ro\\'yxatdan o\\'tdingiz, rahmat!<br><br><a href="https://t.me/turktili_ku" style="display:block;text-align:center;background:#229ed9;color:#fff;padding:12px;border-radius:8px;text-decoration:none">Telegram guruhiga qo\\'shilish</a>'}else m.textContent='❌ '+(await r.text())}</script>`;
 
 function xlsxBuffer() {
   const ws = XLSX.utils.json_to_sheet(rows.map((r, i) => ({
