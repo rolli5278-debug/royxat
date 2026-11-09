@@ -30,7 +30,7 @@ button{background:#2563eb;color:#fff;border:0}p{min-height:1.4em}</style>
 <button>Yuborish</button><p id=m></p></form>
 <script>f.onsubmit=async e=>{e.preventDefault();m.textContent='...';
 const r=await fetch('/api/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(f)))});
-if(r.ok){f.reset();m.innerHTML='✅ Ro\\'yxatdan o\\'tdingiz, rahmat!<br><br><a href="https://t.me/turktili_ku" style="display:block;text-align:center;background:#229ed9;color:#fff;padding:12px;border-radius:8px;text-decoration:none">Telegram guruhiga qo\\'shilish</a>'}else m.textContent='❌ '+(await r.text())}</script>`;
+if(r.ok||r.status==409){f.reset();m.innerHTML=(r.ok?'✅ Ro\\'yxatdan o\\'tdingiz, rahmat!':'ℹ️ Siz allaqachon ro\\'yxatdan o\\'tgansiz.')+'<br><br><a href="https://t.me/turktili_ku" style="display:block;text-align:center;background:#229ed9;color:#fff;padding:12px;border-radius:8px;text-decoration:none">Telegram guruhiga qo\\'shilish</a>'}else m.textContent='❌ '+(await r.text())}</script>`;
 
 function xlsxBuffer() {
   const ws = XLSX.utils.json_to_sheet(rows.map((r, i) => ({
@@ -101,6 +101,8 @@ http.createServer((req, res) => {
         if (req_ && !row[k]) return res.writeHead(400).end(`"${label}" to'ldirilmagan`);
       }
       if (!/^\+?[\d\s()-]{7,20}$/.test(row.telefon)) return res.writeHead(400).end("Telefon raqami noto'g'ri");
+      const last9 = (s) => s.replace(/\D/g, '').slice(-9); // +998 90... va 90... bir xil raqam
+      if (rows.some((r) => last9(r.telefon) === last9(row.telefon))) return res.writeHead(409).end('duplicate');
       rows.push(row);
       fs.writeFileSync(DB, JSON.stringify(rows));
       admins.forEach((a) => say(a, `🆕 №${rows.length}: ${row.ism}, ${row.telefon}`));
